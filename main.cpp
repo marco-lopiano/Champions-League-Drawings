@@ -26,11 +26,16 @@ int main() {
 
     ifstream f("teams.json");
     json teams = json::parse(f);
+    vector<string> pots = { "Pot1", "Pot2", "Pot3", "Pot4" };
 
-    vector<string> myArray = teams["Pot1"].get<vector<string>>();
+    for (auto i : pots){
 
-    string t = selectRandom( &myArray );
-    cout << t << endl;
+        cout << "Evaluating: " << i << endl;
+
+        vector<string> myArray = teams[i].get<vector<string>>();
+        string t = selectRandom( &myArray );
+        cout << "---" << t << endl;
+    }
     return 0;
 }
 
