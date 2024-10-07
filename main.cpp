@@ -5,7 +5,8 @@
 #include "json.hpp" // super ugly
 #include <fstream> 
 
-// compiling with: g++ -o main -std=c++17 -Wall -Wextra -pedantic main.cpp
+// compiling with:
+// g++ -o main -std=c++17 -Wall -Wextra -pedantic main.cpp
 
 using namespace std;
 using json = nlohmann::json;
@@ -18,6 +19,7 @@ int validityCheck(string current,  string drawed){
     }
 }
 
+// barely understanding what's going on here, will need to come back to this
 string selectRandom(vector<string>* array){
     vector<string> out;
     sample(
@@ -32,7 +34,6 @@ string selectRandom(vector<string>* array){
 
 vector<string> runDrawings(vector<string>* array){
     vector<string> out;
-
     return out;
 }
 
