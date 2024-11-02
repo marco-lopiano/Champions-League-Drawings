@@ -3,37 +3,34 @@
 #include <random>
 #include <vector>
 #include "json.hpp" // super ugly
-#include <fstream> 
-
-// compiling with:
-// g++ -o main -std=c++17 -Wall -Wextra -pedantic main.cpp
+#include <fstream>
+#include <unordered_map>
 
 using namespace std;
 using json = nlohmann::json;
 
-int validityCheck(string current,  string drawed){
-    if ( current == drawed ){
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-// barely understanding what's going on here, will need to come back to this
-string selectRandom(vector<string>* array){
+vector<string> selectRandom(vector<string>* array, string avoid){
     vector<string> out;
+    // barely understanding what's going on here, will need to come back to this
+    // gets 3 random items from vector
     sample(
         (*array).begin(),
         (*array).end(),
         back_inserter(out), // seems unnecessary, here for the time being as it is working
-        1,
+        3,
         mt19937{random_device{}()}
     );
-    return out[0];
-}
 
-vector<string> runDrawings(vector<string>* array){
-    vector<string> out;
+    // If element is found found, erase it otherwise remove latest element 
+    // to make sure we have only 2 entries
+    auto it = std::find(out.begin(), out.end(), avoid);
+
+    if (it != out.end()) {
+        out.erase(it);
+    } else {
+        out.pop_back();
+    }
+
     return out;
 }
 
@@ -41,15 +38,27 @@ int main() {
 
     ifstream f("teams.json");
     json teams = json::parse(f);
-    vector<string> pots = {"Pot1", "Pot2", "Pot3", "Pot4"};
+    unordered_map<string, vector<string>> drawings;
 
-    vector<string> currentTeam = teams["Pot1"].get<vector<string>>();
-    string test = selectRandom( &currentTeam );
+    vector<string> pots = {"Pot1", "Pot2", "Pot3", "Pot4"}; // TODO: get these from json file too
+    
+    string currentTeam = "Internazionale";
+    vector<string> currentTeams = teams["Pot1"].get<vector<string>>();
 
-    int res = validityCheck( "Internazionale", test );
+    vector<string> test = selectRandom( &currentTeams, currentTeam);
 
-    cout << test << endl;
-    cout << static_cast<int16_t>(res) << endl;
+    drawings[currentTeam] = test;
+
+    for (auto  i : drawings) {
+        for (auto j : i.second) {
+            cout << j << endl;
+        }
+    }
+
+
+
+    // cout << test << endl;
+    // cout << static_cast<int16_t>(res) << endl;
 
     // for (auto p : pots){
 
