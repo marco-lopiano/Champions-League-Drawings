@@ -47,7 +47,8 @@ int main() {
 
     vector<string> test = selectRandom( &currentTeams, currentTeam);
 
-    drawings[currentTeam] = test;
+    drawings[currentTeam] = {test};
+
 
     for (auto  i : drawings) {
         for (auto j : i.second) {
