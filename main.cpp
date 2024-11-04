@@ -2,9 +2,14 @@
 #include <iostream>
 #include <random>
 #include <vector>
-#include "json.hpp" // super ugly
+#include <nlohmann/json.hpp>
 #include <fstream>
 #include <unordered_map>
+
+/*
+COMPILER COMMAND:
+g++ -o main -std=c++17 -Wall -Wextra -I /opt/homebrew/Cellar/nlohmann-json/3.11.3/include -pedantic main.cpp
+*/
 
 using namespace std;
 using json = nlohmann::json;
