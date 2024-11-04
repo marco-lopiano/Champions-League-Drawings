@@ -61,17 +61,17 @@ vector<string> selectRandom(vector<string>* array, string avoid){
 void diplayTeamDrawings (PerTeamCollectionOfDrawings dataIn) {
     cout << dataIn.team << endl;
     cout << right << "--- H:   "
-        << setw(dataIn.teamDrawings[0].away.size()) << right << dataIn.teamDrawings[0].home << "   "
-        << setw(dataIn.teamDrawings[1].away.size()) << right << dataIn.teamDrawings[1].home << "   "
-        << setw(dataIn.teamDrawings[2].away.size()) << right << dataIn.teamDrawings[2].home << "   "
-        << setw(dataIn.teamDrawings[2].away.size()) << right << dataIn.teamDrawings[3].home << "   "
+        << setw(dataIn.teamDrawings[0].away.size()) << right << dataIn.teamDrawings[0].home << " | "
+        << setw(dataIn.teamDrawings[1].away.size()) << right << dataIn.teamDrawings[1].home << " | "
+        << setw(dataIn.teamDrawings[2].away.size()) << right << dataIn.teamDrawings[2].home << " | "
+        << setw(dataIn.teamDrawings[2].away.size()) << right << dataIn.teamDrawings[3].home << " | "
         << endl;
 
     cout << right << "--- A:   "
-        << setw(dataIn.teamDrawings[0].home.size()) << right << dataIn.teamDrawings[0].away << "   "
-        << setw(dataIn.teamDrawings[1].home.size()) << right << dataIn.teamDrawings[1].away << "   "
-        << setw(dataIn.teamDrawings[2].home.size()) << right << dataIn.teamDrawings[2].away << "   "
-        << setw(dataIn.teamDrawings[3].home.size()) << right << dataIn.teamDrawings[3].away << "   "
+        << setw(dataIn.teamDrawings[0].home.size()) << right << dataIn.teamDrawings[0].away << " | "
+        << setw(dataIn.teamDrawings[1].home.size()) << right << dataIn.teamDrawings[1].away << " | "
+        << setw(dataIn.teamDrawings[2].home.size()) << right << dataIn.teamDrawings[2].away << " | "
+        << setw(dataIn.teamDrawings[3].home.size()) << right << dataIn.teamDrawings[3].away << " | "
         << endl;
 }
 
