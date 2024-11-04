@@ -58,21 +58,43 @@ vector<string> selectRandom(vector<string>* array, string avoid){
     return out;
 }
 
-void diplayTeamDrawings (PerTeamCollectionOfDrawings dataIn) {
+void diplayTeamDrawings (PerTeamCollectionOfDrawings dataIn, int separator) {
     cout << dataIn.team << endl;
-    cout << right << "--- H:   "
-        << setw(dataIn.teamDrawings[0].away.size()) << right << dataIn.teamDrawings[0].home << " | "
-        << setw(dataIn.teamDrawings[1].away.size()) << right << dataIn.teamDrawings[1].home << " | "
-        << setw(dataIn.teamDrawings[2].away.size()) << right << dataIn.teamDrawings[2].home << " | "
-        << setw(dataIn.teamDrawings[2].away.size()) << right << dataIn.teamDrawings[3].home << " | "
+    cout << right << "    H:   "
+        << setw(separator) << right << dataIn.teamDrawings[0].home << " | "
+        << setw(separator) << right << dataIn.teamDrawings[1].home << " | "
+        << setw(separator) << right << dataIn.teamDrawings[2].home << " | "
+        << setw(separator) << right << dataIn.teamDrawings[3].home << " | "
         << endl;
 
-    cout << right << "--- A:   "
-        << setw(dataIn.teamDrawings[0].home.size()) << right << dataIn.teamDrawings[0].away << " | "
-        << setw(dataIn.teamDrawings[1].home.size()) << right << dataIn.teamDrawings[1].away << " | "
-        << setw(dataIn.teamDrawings[2].home.size()) << right << dataIn.teamDrawings[2].away << " | "
-        << setw(dataIn.teamDrawings[3].home.size()) << right << dataIn.teamDrawings[3].away << " | "
+    cout << right << "    A:   "
+        << setw(separator) << right << dataIn.teamDrawings[0].away << " | "
+        << setw(separator) << right << dataIn.teamDrawings[1].away << " | "
+        << setw(separator) << right << dataIn.teamDrawings[2].away << " | "
+        << setw(separator) << right << dataIn.teamDrawings[3].away << " | "
         << endl;
+}
+ 
+vector<string> concatenateTeams(json data, vector<string>* pots) {
+    vector<string> out;
+    for (auto i : *pots){
+        vector<string> temp = data[i].get<vector<string>>();
+        out.insert( out.end(), temp.begin(), temp.end());
+    }
+    return out;
+}
+
+int getMax (vector<string> *array) {
+    int myMax = 0;
+
+    for (auto i : *array) {
+        int current = i.size();
+
+        if (current > myMax) {
+            myMax = current;
+        }
+    }
+    return myMax;
 }
 
 int main() {
@@ -82,18 +104,23 @@ int main() {
   
     vector<string> pots = {"Pot1", "Pot2", "Pot3", "Pot4"}; // TODO: get these from json file too
 
-    string currentTeam = "Internazionale";
-    PerTeamCollectionOfDrawings otherTest(currentTeam);
+    vector<string> allTeams = concatenateTeams( teams, &pots );
 
-    for (auto p : pots){
-        vector<string> potTeams = teams[p].get<vector<string>>();
-        vector<string> potSelection = selectRandom( &potTeams, currentTeam );
+    int sep = getMax(&allTeams);
 
-        SinglePotDraw potDraw(potSelection, p);
-        otherTest.teamDrawings.push_back(potDraw);
+    for (auto currentTeam : allTeams) {
+
+        PerTeamCollectionOfDrawings otherTest(currentTeam);
+
+        for (auto p : pots){
+            vector<string> potTeams = teams[p].get<vector<string>>();
+            vector<string> potSelection = selectRandom( &potTeams, currentTeam );
+
+            SinglePotDraw potDraw(potSelection, p);
+            otherTest.teamDrawings.push_back(potDraw);
+        }
+        diplayTeamDrawings( otherTest, sep);
     }
-
-    diplayTeamDrawings( otherTest );
     return 0;
 }
 
