@@ -4,3 +4,5 @@
 main
 *.code-workspace
 *dev*
+backup
+*.o

@@ -4,77 +4,12 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include <fstream>
-
-/*
-COMPILER COMMAND:
-g++ -o main -std=c++17 -Wall -Wextra -I /opt/homebrew/Cellar/nlohmann-json/3.11.3/include -pedantic main.cpp
-*/
+#include <unordered_map>
 
 using namespace std;
 using json = nlohmann::json;
 
-class SinglePotDraw {
-    public:
-        string potType;
-        string home;
-        string away;
-        SinglePotDraw(vector<string> x, string y) {
-            home = x[0];
-            away = x[1];
-            potType = y;
-        }
-};
-
-class PerTeamCollectionOfDrawings {
-    public:
-        string team;
-        vector<SinglePotDraw> teamDrawings;
-        PerTeamCollectionOfDrawings(string name) {
-            team = name;
-        } 
-};
-
-vector<string> selectRandom(vector<string>* array, string avoid){
-    vector<string> out;
-    // gets 3 random teams from vector
-    sample(
-        (*array).begin(),
-        (*array).end(),
-        back_inserter(out), // seems unnecessary, here for the time being as it is working
-        3,
-        mt19937{random_device{}()}
-    );
-
-    // If element is found found, erase it otherwise remove latest element 
-    // to make sure we have only 2 entries
-    auto foundSelf = std::find(out.begin(), out.end(), avoid);
-
-    if (foundSelf != out.end()) {
-        out.erase(foundSelf);
-    } else {
-        out.pop_back();
-    }
-
-    return out;
-}
-
-void diplayTeamDrawings (PerTeamCollectionOfDrawings dataIn, int separator) {
-    cout << dataIn.team << endl;
-    cout << right << "    H:   "
-        << setw(separator) << right << dataIn.teamDrawings[0].home << " | "
-        << setw(separator) << right << dataIn.teamDrawings[1].home << " | "
-        << setw(separator) << right << dataIn.teamDrawings[2].home << " | "
-        << setw(separator) << right << dataIn.teamDrawings[3].home << " | "
-        << endl;
-
-    cout << right << "    A:   "
-        << setw(separator) << right << dataIn.teamDrawings[0].away << " | "
-        << setw(separator) << right << dataIn.teamDrawings[1].away << " | "
-        << setw(separator) << right << dataIn.teamDrawings[2].away << " | "
-        << setw(separator) << right << dataIn.teamDrawings[3].away << " | "
-        << endl;
-}
- 
+// HELPERS
 vector<string> concatenateTeams(json data, vector<string>* pots) {
     vector<string> out;
     for (auto i : *pots){
@@ -84,18 +19,147 @@ vector<string> concatenateTeams(json data, vector<string>* pots) {
     return out;
 }
 
-int getMax (vector<string> *array) {
-    int myMax = 0;
+class Draw {
+    public:
+        string home;
+        string away;
+        bool valid;
 
-    for (auto i : *array) {
-        int current = i.size();
+        Draw(bool isValid = true) {
+            home = "None";
+            away = "None";
+            valid = isValid;
+        };
 
-        if (current > myMax) {
-            myMax = current;
+        bool isFull() {
+            if (home == "None" && away == "None") {
+                return true;
+            } else {
+                return false;
+            }
         }
-    }
-    return myMax;
-}
+
+        bool isHomeFull() {
+            if (home == "None") {
+                return false;
+            }
+            return true;
+        }
+
+        bool isAwayFull() {
+            if (away == "None") {
+                return false;
+            }
+            return true;
+        }
+
+        bool isValid() {
+            return valid;
+        }
+};
+
+class TeamCalendar {
+    public:
+        string name;
+        unordered_map<string, Draw> draws;
+        bool valid;
+        TeamCalendar() = default; // https://stackoverflow.com/questions/71047000/error-no-matching-function-for-call-to-nodenode-secondstdforward-ar
+
+        TeamCalendar(string x, bool isValid = true) {
+            name = x;
+            valid = isValid;
+
+        }
+        
+        Draw getPotByType(string potType) {
+            Draw out(false);
+            if ( draws.find(potType) != draws.end() ) {
+                out = draws[potType];
+            }
+            return out;
+        }
+
+        void addPot(string potType, Draw draw) {
+            if (getPotByType(potType).isValid() == false){
+                draws[potType] = draw;
+            }
+        }
+        bool isValid() {
+            return valid;
+        }
+
+        void display(){
+            cout << "display method to be implemented" << endl;
+        }
+};
+
+class Calendar {
+    public:
+        string season;
+        vector<string> teams;
+        vector<string> pots;
+        unordered_map<string, TeamCalendar> calendar;
+
+        Calendar(string x, vector<string>y,  vector<string> z) {
+            season = x;
+            teams = y;
+            pots = z;
+        }
+
+        TeamCalendar getTeamCalendar(string teamName) {
+            TeamCalendar out("False", false);
+            if ( calendar.find(teamName) != calendar.end() ) {
+                out = calendar[teamName];
+            }
+            return out;
+        }
+
+        void addToCalendar(string teamName, TeamCalendar data_in) {
+             if (getTeamCalendar(teamName).isValid() == false){
+                calendar[teamName] = data_in;
+            }
+        }
+
+        void runDrawings() {
+
+            for (auto currentTeam : teams) {
+
+                // adds team calendar to calendar if not already there
+                TeamCalendar temp = TeamCalendar(currentTeam);
+                addToCalendar(currentTeam, temp);
+      
+                cout << temp.isValid() << endl;
+
+                // check if team is already in calendar
+
+                // TeamCalendar currentTeamCalendar(currentTeam);
+
+        //         Draw test = currentTeamCalendar.getPotByType("Pot1");
+
+        //         cout << test.isValid() << endl;
+
+        //         // cout << test << endl;
+
+        //             for (auto p : pots){
+
+        //                 Draw tempDraw;
+                
+
+        //                 // vector<string> potTeams = teams[p].get<vector<string>>();
+        //                 // vector<string> potSelection = selectRandom( &potTeams, currentTeam );
+
+        //                 // SinglePotDraw potDraw(potSelection, p);
+        //                 // otherTest.teamDrawings.push_back(potDraw);
+
+        //                 break;
+        //             }
+
+        //         //     diplayTeamDrawings( otherTest, sep);
+
+                    break;
+            }
+        }
+};
 
 int main() {
 
@@ -106,21 +170,12 @@ int main() {
 
     vector<string> allTeams = concatenateTeams( teams, &pots );
 
-    int sep = getMax(&allTeams);
+    // int sep = getMax(&allTeams);
 
-    for (auto currentTeam : allTeams) {
+    Calendar currentCalendar( "2024/25", allTeams, pots );
+    currentCalendar.runDrawings();
 
-        PerTeamCollectionOfDrawings otherTest(currentTeam);
 
-        for (auto p : pots){
-            vector<string> potTeams = teams[p].get<vector<string>>();
-            vector<string> potSelection = selectRandom( &potTeams, currentTeam );
-
-            SinglePotDraw potDraw(potSelection, p);
-            otherTest.teamDrawings.push_back(potDraw);
-        }
-        diplayTeamDrawings( otherTest, sep);
-    }
     return 0;
 }
 
