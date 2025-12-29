@@ -1,5 +1,6 @@
-{"Pot1" : ["Real Madrid", "Manchester City", "Bayern Munich", "Paris Saint-Germain", "Liverpool", "Internazionale", "Borussia Dortmund", "RB Leipzig", "Barcelona"],
- "Pot2" : ["Bayer Leverkusen", "Atletico Madrid", "Atalanta", "Juventus", "Benfica", "Arsenal", "Club Brugge", "Shakhtar Donetsk", "AC Milan"],
- "Pot3" : ["Feyenoord", "Sporting CP", "PSV Eindhoven", "Dinamo Zagreb", "FC Salzburg", "Lille", "Red Star Belgrade", "Young Boys", "Celtic"],
- "Pot4" : ["Slovan Bratislava", "AS Monaco", "Sparta Prague", "Aston Villa", "Bologna", "Girona", "VfB Stuttgart", "Sturm Graz", "Brest"]
- }
+{
+    "Pot1" : [["Real Madrid", 10.0], ["Manchester City", 9.5], ["Bayern Munich", 9.5], ["Paris Saint-Germain", 9.5], ["Liverpool", 9.0], ["Internazionale", 9.0], ["Borussia Dortmund", 9.0], ["RB Leipzig", 7.0], ["Barcelona", 9.5]],
+    "Pot2" : [["Bayer Leverkusen", 8.0], ["Atletico Madrid", 8.0], ["Atalanta", 7.0], ["Juventus", 7.5], ["Benfica", 8.0], ["Arsenal", 8.0], ["Club Brugge", 7], ["Shakhtar Donetsk", 7], ["AC Milan", 7]],
+    "Pot3" : [["Feyenoord", 6.0], ["Sporting CP", 6.0], ["PSV Eindhoven", 7.0], ["Dinamo Zagreb", 6.5], ["FC Salzburg", 6.0], ["Lille", 6.0], ["Red Star Belgrade", 5.5], ["Young Boys", 5.0], ["Celtic", 6.0]],
+    "Pot4" : [["Slovan Bratislava", 4.0], ["AS Monaco", 4.0], ["Sparta Prague", 4.0], ["Aston Villa", 5], ["Bologna", 5.0], ["Girona", 4.0], ["VfB Stuttgart", 4.0], ["Sturm Graz", 4.0], ["Brest", 4.0]]
+}
