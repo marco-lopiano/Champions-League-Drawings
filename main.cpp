@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <unordered_map>
+#include <optional>
 
 using namespace std;
 using json = nlohmann::json;
@@ -13,63 +14,109 @@ struct Team {
     string name;
     double rating;
 
-    string pot1_h;
-    string pot1_a;
-
-    string pot2_h;
-    string pot2_a;
-
-    string pot3_h;
-    string pot3_a;
-
-    string pot4_h;
-    string pot4_a;
+    string belongsTo;
+    string region;
 };
 
-vector<Team> loadPot(const json& potJson) {
-    vector<Team> pot;
+struct Match {
+    string pot;
+    Team* home;
+    Team* away;
+    double temperature;
+};
 
-    for (auto& entry : potJson) {
-        Team t;
-        t.name = entry[0].get<std::string>();
-        t.rating = entry[1].get<double>();
-        pot.push_back(t);
-    }
-    return pot;
-}
+class Calendar {
+    public:
+        json teams;
+        vector<Team> Teams;
+        vector<Match> Matches;
 
-void display_teams(json teams){
-    for (auto& [key, value] : teams.items()) {
-        cout << "***** ";
-        cout << key;
-        cout << " *****" << endl;
+        Calendar(json x) {
+            teams = x;
+            initialize(teams);
+        };
 
-        vector<Team> pot = loadPot(value);
+        void initialize(const json& teams) {
+            for (auto& [key, value] : teams.items()) {
+                for (auto& entry : value) {
+                    Team t;
+                    t.name = entry[0].get<std::string>();
+                    t.rating = entry[1].get<double>();
+                    t.belongsTo = key;
+                    Teams.push_back(t);
+                }
+            }
+        };
 
-        for (auto& t : pot){
-            cout << t.name << endl;
-            cout << "--- rating: " << t.rating << endl;
-            cout << "--- Pot 1 home: " << t.pot1_h << endl;
-            cout << "--- Pot 1 away: " << t.pot1_a << endl;
+        void traverseAllMatches(){
+            for (const auto& m : Matches) {
+                cout << "***" << endl;
+                cout << m.pot << endl;
+                cout << m.home->name << " vs " << m.away->name << " " << m.temperature << endl;
+            }
+        };
 
-            cout << "--- Pot 2 home: " << t.pot2_h << endl;
-            cout << "--- Pot 2 away: " << t.pot2_a << endl;
+        Team* getTeamByName(string name) {
+            for (auto& entry : Teams){
+                if (entry.name == name) {
+                    return &entry;
+                }
+            }
+            return nullptr;
+        };
 
-            cout << "--- Pot 3 home: " << t.pot3_h << endl;
-            cout << "--- Pot 3 away: " << t.pot3_a << endl;
+        void addMatch(string teamA, string teamB, string potType) {
+            auto tA = getTeamByName(teamA);
+            auto tB = getTeamByName(teamB);
 
-            cout << "--- Pot 4 home: " << t.pot4_h << endl;
-            cout << "--- Pot 4 away: " << t.pot4_a << endl;
+
+            if (!tA || !tB) {
+                cerr << "Team not found\n";
+                return;
+            }
+
+            if (tA->name == tB->name) {
+                cerr << "Team cannot be againts itself\n";
+                return;
+            }
+
+            if ( tA->belongsTo != potType && tB->belongsTo != potType ) {
+                cerr << "At least one Team needs to belong to the pot type\n";
+                return;
+            }
+
+            Match m;
+            m.pot = potType;
+            m.home = tA;
+            m.away = tB;
+            m.temperature = tA->rating + tB->rating;
+            Matches.push_back(m);
         }
-    }
-}   
+};
+
 
 int main() {
 
     ifstream f("teams.json");
     json teams = json::parse(f);
 
-    display_teams(teams);
+    Calendar myCal(teams);
+
+    // myCal.traverse();
+
+    myCal.addMatch("Juventus", "Real Madrid", "Pot1");
+    myCal.addMatch("Barcelona", "Barcelona", "Pot1");
+    myCal.addMatch("Barcelona", "Internazionale", "Pot1");
+
+
+
+    myCal.traverseAllMatches();
+
+    // auto t = myCal.getTeamByName("Real Madrid");
+    // if (t) {
+    //     cout << (*t).name << "\n";
+    // }
+
 
     return 0;
 }
