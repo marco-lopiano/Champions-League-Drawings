@@ -63,11 +63,16 @@ class Calendar {
 
         int countMatches (Team* team, string potType, string location) {
             int counter = 0;
-            vector<string> pots = {"Pot1", "Pot2", "Pot3", "Pot4"};
 
             for (auto& m : matches) {
                 if (location == "home") {
                     if (team->name == m.home->name && team->placementPot == potType) {
+                        counter ++;
+                    }
+                }
+
+                if (location == "away") {
+                    if (team->name == m.away->name && team->placementPot == potType) {
                         counter ++;
                     }
                 }
@@ -76,7 +81,6 @@ class Calendar {
             return counter;
         }
         
-        // TODO: add cases?
         bool isMatchPossible (Team* tH, Team* tA) {
             if (!tH || !tA) {
                 cerr << "Team not found\n";
@@ -88,8 +92,18 @@ class Calendar {
                 return false;
             }
 
-            int homeTeamCountH = countMatches(tH, "Pot1", "home");
-            if (homeTeamCountH >= 2) {
+            int hasHomeMatch = countMatches(tH, tA->placementPot, "home");
+            if (hasHomeMatch == 1) {
+                return false;
+            }
+
+            int hasAwayMatch = countMatches(tH, tA->placementPot, "away");
+            if (hasAwayMatch == 1) {
+                return false;
+            }
+
+            int homeTeamCountH = countMatches(tH, tA->placementPot, "home");
+            if (homeTeamCountH >= 2) { // cannot be bigger than 2 but better safe than sorry?
                 return false;
             }
 
@@ -133,6 +147,8 @@ int main() {
 
     myCal.addMatch("Internazionale", "Real Madrid");
     myCal.addMatch("Internazionale", "Barcelona");
+    myCal.addMatch("Barcelona", "Internazionale");
+
     myCal.addMatch("Bayern Munich", "Internazionale");
 
 
