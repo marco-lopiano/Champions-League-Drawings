@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <random>
 #include <vector>
 #include <nlohmann/json.hpp>
@@ -14,126 +15,92 @@ struct Team {
     string name;
     string region;
     double rating;
-    string placementPot;
-};
+    int startingPot;
+    array<array<int, 2>, 4> pots = {{
+        { -1, -1 },
+        { -1, -1 },
+        { -1, -1 },
+        { -1, -1 }
+    }};
 
-struct Match {
-    double temperature;
-    Team* home;
-    Team* away;
 };
 
 class Calendar {
     public:
         json teamsData;
         vector<Team> teams;
-        vector<Match> matches;
+        vector<string> pots = {"Pot1", "Pot2", "Pot3", "Pot4"};
 
         Calendar(json x) {
             teamsData = x;
             initialize(teamsData);
         };
 
+        optional<int> getPotIndex(string potstring) {
+            auto it = find(pots.begin(), pots.end(), potstring);
+
+            if (it != pots.end()) {
+                int index = it - pots.begin();
+                return index;
+            }
+            return nullopt;
+        };
+
         void initialize(const json& teamsData) {
             for (auto& [key, value] : teamsData.items()) {
                 for (auto& entry : value) {
-                    Team t;
-                    t.name = entry[0].get<std::string>();
-                    t.rating = entry[1].get<double>();
-                    t.placementPot = key;
-                    teams.push_back(t);
+
+                    auto _potindex = getPotIndex(key);
+                    if (_potindex) {
+                        Team t;
+                        t.name = entry[0].get<std::string>();
+                        t.rating = entry[1].get<double>();
+                        t.startingPot = *_potindex;
+                        teams.push_back(t);
+                    }
                 }
             }
         };
 
-        void listTeams() {
+        void listTeamsData() {
             for (Team t : teams) {
-                cout << t.name << " - " << t.placementPot << " - " << t.rating << endl;
+                cout << t.name << " - " << pots[t.startingPot] << " - " << t.rating << endl;
             }
         };
 
-        Team* getTeamByName(string name) {
-            for (auto& entry : teams){
-                if (entry.name == name) {
-                    return &entry;
+        // TODO: add color to team based on pot
+        // TODO: add color to pot matches based on difficulty
+        void printCalendar() {
+            constexpr int teamNameWidth = 20;
+
+            cout << "┌" << string(teamNameWidth + 4 * 7, '-') << "┐" << "\n";
+
+            cout << "|" << setw(teamNameWidth) << left << "Team Name";
+
+            for (int p = 0; p < 4; ++p) {
+                cout << "| POT" << (p + 1) << " ";
+            }
+            cout << "|" << "\n";
+
+            cout << "|" << setw(teamNameWidth) << left << " ";
+
+            for (int p = 0; p < 4; ++p) {
+                cout << "| H  A ";
+            }
+            cout << "|" << "\n";
+
+            cout << "|" << string(teamNameWidth + 4 * 7, '-') << "|" << "\n";
+
+            for (const Team& t : teams) {
+                cout << "|" << setw(teamNameWidth) << left << t.name << "|";
+                
+                constexpr int potWidth = 3;
+                for (int p = 0; p < 4; ++p) {
+                    cout << setw(potWidth) << t.pots[p][0] << setw(potWidth) << right << t.pots[p][1] << "|";
                 }
+                cout << "\n";
             }
-            return nullptr;
-        };
-
-        int countMatches (Team* team, string potType, string location) {
-            int counter = 0;
-
-            for (auto& m : matches) {
-                if (location == "home") {
-                    if (team->name == m.home->name && team->placementPot == potType) {
-                        counter ++;
-                    }
-                }
-
-                if (location == "away") {
-                    if (team->name == m.away->name && team->placementPot == potType) {
-                        counter ++;
-                    }
-                }
-            }
-
-            return counter;
-        }
-        
-        bool isMatchPossible (Team* tH, Team* tA) {
-            if (!tH || !tA) {
-                cerr << "Team not found\n";
-                return false;
-            }
-
-            if (tH->name == tA->name) {
-                cerr << "Team cannot be againts itself\n";
-                return false;
-            }
-
-            int hasHomeMatch = countMatches(tH, tA->placementPot, "home");
-            if (hasHomeMatch == 1) {
-                return false;
-            }
-
-            int hasAwayMatch = countMatches(tH, tA->placementPot, "away");
-            if (hasAwayMatch == 1) {
-                return false;
-            }
-
-            int homeTeamCountH = countMatches(tH, tA->placementPot, "home");
-            if (homeTeamCountH >= 2) { // cannot be bigger than 2 but better safe than sorry?
-                return false;
-            }
-
-            // if ( tA->placementPot != potType && tB->placementPot != potType ) {
-            //     cerr << "At least one Team needs to belong to the pot type\n";
-            //     return false;
-            // }
-            return true;
-        }
-
-        void addMatch(string teamHome, string teamAway) {
-            auto tH = getTeamByName(teamHome);
-            auto tA = getTeamByName(teamAway);
-
-            bool check = isMatchPossible(tH, tA);
-
-            if ( check == true) {
-                Match m;
-                m.home = tH;
-                m.away = tA;
-                m.temperature = tH->rating + tA->rating;
-                matches.push_back(m);
-            }
-        }
-
-        void listMatches(){
-            for (const auto& m : matches) {
-                cout << "***" << endl;
-                cout << "Home: " << m.home->name << " (" << m.home->placementPot << ")" << " vs " << "Away: " << m.away->name << " (" << m.away->placementPot << ")" << " " << m.temperature << endl;
-            }
+            cout << "└" << string(teamNameWidth + 4 * 7, '-') << "┘" << "\n";
         };
 };
 
@@ -145,18 +112,15 @@ int main() {
 
     Calendar myCal(teams);
 
-    myCal.addMatch("Internazionale", "Real Madrid");
-    myCal.addMatch("Internazionale", "Barcelona");
-    myCal.addMatch("Barcelona", "Internazionale");
+    // manual match making for testing purposes
+    myCal.teams[0].pots[myCal.teams[1].startingPot][0] = 1;
+    myCal.teams[1].pots[myCal.teams[0].startingPot][1] = 0;
 
-    myCal.addMatch("Bayern Munich", "Internazionale");
+    myCal.teams[0].pots[myCal.teams[14].startingPot][0] = 14;
+    myCal.teams[14].pots[myCal.teams[0].startingPot][1] = 0;
 
+    myCal.printCalendar();
 
-    myCal.addMatch("Internazionale", "Atletico Madrid");
-
-
-
-    myCal.listMatches();
 
     return 0;
 }
