@@ -28,13 +28,13 @@ struct Team {
 struct Slot {
     int team;
     int pot;
-    int ha; // 0 = home, 1 = away
+    int ha;
 };
-
 
 class Calendar {
     private:
         mt19937 rng;
+        bool DEBUG = false;
 
     public:
         json teamsData;
@@ -42,8 +42,9 @@ class Calendar {
         vector<string> pots = {"Pot1", "Pot2", "Pot3", "Pot4"};
         vector<Slot> slots;
 
-        Calendar(json x, unsigned seed = 42) : rng(seed) {
+        Calendar(json x, unsigned seed = 42, bool _debug=false) : rng(seed) {
             teamsData = x;
+            DEBUG = _debug;
             initialize(teamsData);
         };
 
@@ -66,6 +67,7 @@ class Calendar {
                         Team t;
                         t.name = entry[0].get<std::string>();
                         t.rating = entry[1].get<double>();
+                        t.region = entry[2].get<std::string>();
                         t.startingPot = *_potindex;
                         teams.push_back(t);
                     }
@@ -178,11 +180,27 @@ class Calendar {
         };
 
         void placeMatch(int t, int opp, int pot, int ha) {
+            if (DEBUG) {
+                cout << " - Placing: "
+                << teams[t].name << " vs "
+                << teams[opp].name
+                << " in pot " << pot
+                << (ha == 0 ? " (home)\n" : " (away)\n");
+            }
+
             teams[t].pots[pot][ha] = opp;
             teams[opp].pots[teams[t].startingPot][1 - ha] = t;
         };
 
         void undoMatch(int t, int opp, int pot, int ha) {
+            if (DEBUG) {
+                cout << " - Undoing: "
+                << teams[t].name << " vs "
+                << teams[opp].name
+                << " in pot " << pot
+                << (ha == 0 ? " (home)\n" : " (away)\n");
+            }
+
             teams[t].pots[pot][ha] = -1;
             teams[opp].pots[teams[t].startingPot][1 - ha] = -1;
         };
@@ -240,7 +258,7 @@ int main() {
     ifstream f("teams.json");
     json teams = json::parse(f);
 
-    Calendar cal(teams, 23);
+    Calendar cal(teams, 123456);
 
     if (!cal.buildCalendar()) {
         cout << "Draw failed (deadlock)\n";
