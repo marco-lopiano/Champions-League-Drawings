@@ -25,13 +25,24 @@ struct Team {
 
 };
 
+struct Slot {
+    int team;
+    int pot;
+    int ha; // 0 = home, 1 = away
+};
+
+
 class Calendar {
+    private:
+        mt19937 rng;
+
     public:
         json teamsData;
         vector<Team> teams;
         vector<string> pots = {"Pot1", "Pot2", "Pot3", "Pot4"};
+        vector<Slot> slots;
 
-        Calendar(json x) {
+        Calendar(json x, unsigned seed = 42) : rng(seed) {
             teamsData = x;
             initialize(teamsData);
         };
@@ -71,7 +82,7 @@ class Calendar {
         // TODO: add color to team based on pot
         // TODO: add color to pot matches based on difficulty
         void printCalendar() {
-            constexpr int teamNameWidth = 20;
+            constexpr int teamNameWidth = 22;
 
             cout << "┌" << string(teamNameWidth + 4 * 7, '-') << "┐" << "\n";
 
@@ -102,6 +113,125 @@ class Calendar {
             }
             cout << "└" << string(teamNameWidth + 4 * 7, '-') << "┘" << "\n";
         };
+
+        vector<Slot> buildSlots() {
+            for (int t = 0; t < (int)teams.size(); ++t) {
+                for (int p = 0; p < 4; ++p) {
+                    for (int ha = 0; ha < 2; ++ha) {
+                        slots.push_back({t, p, ha});
+                    }
+                }
+            }
+            return slots;
+        };
+
+        bool isValid(int t, int opp, int pot, int ha) {
+            // Team cannot play itself
+            if (t == opp)
+                return false;
+
+            // Opponent must belong to the pot
+            if (teams[opp].startingPot != pot)
+                return false;
+
+            // Slot must be unassigned
+            if (teams[t].pots[pot][ha] != -1)
+                return false;
+
+            // Opponents slot must be unassigned
+            int oppPot = teams[t].startingPot;
+            if (teams[opp].pots[oppPot][1 - ha] != -1)
+                return false;
+
+            // Region constraint still not implemented
+            // need to add this in the initializer method and in the json file 
+            if (!teams[t].region.empty() &&
+                teams[t].region == teams[opp].region)
+                return false;
+
+            // No duplicate matches
+            for (int p = 0; p < 4; ++p) {
+                for (int h = 0; h < 2; ++h) {
+                    if (teams[t].pots[p][h] == opp)
+                        return false;
+                }
+            }
+
+            // Optional UEFA-style soft constraint:
+            // max 2 teams from same region
+            if (!teams[t].region.empty()) {
+                int count = 0;
+                for (int p = 0; p < 4; ++p) {
+                    for (int h = 0; h < 2; ++h) {
+                        int other = teams[t].pots[p][h];
+                        if (other != -1 &&
+                            teams[other].region == teams[opp].region) {
+                            count++;
+                        }
+                    }
+                }
+                if (count >= 2)
+                    return false;
+            }
+
+            return true;
+        };
+
+        void placeMatch(int t, int opp, int pot, int ha) {
+            teams[t].pots[pot][ha] = opp;
+            teams[opp].pots[teams[t].startingPot][1 - ha] = t;
+        };
+
+        void undoMatch(int t, int opp, int pot, int ha) {
+            teams[t].pots[pot][ha] = -1;
+            teams[opp].pots[teams[t].startingPot][1 - ha] = -1;
+        };
+
+        vector<int> getCandidates(int t, int pot, int ha) {
+            vector<int> candidates;
+
+            for (int opp = 0; opp < (int)teams.size(); ++opp) {
+                if (isValid(t, opp, pot, ha))
+                    candidates.push_back(opp);
+            }
+
+            shuffle(candidates.begin(), candidates.end(), rng);
+            return candidates;
+        };
+
+        bool solveSlots(const vector<Slot>& slots, int idx = 0) {
+            if (idx == (int)slots.size())
+                return true;
+
+            auto [t, pot, ha] = slots[idx];
+
+            // Already filled? Skip
+            if (teams[t].pots[pot][ha] != -1)
+                return solveSlots(slots, idx + 1);
+
+            auto candidates = getCandidates(t, pot, ha);
+
+            for (int opp : candidates) {
+                placeMatch(t, opp, pot, ha);
+
+                if (solveSlots(slots, idx + 1))
+                    return true;
+
+                undoMatch(t, opp, pot, ha);
+            }
+
+            return false;
+        };
+
+        bool buildCalendar() {
+            auto slots = buildSlots();
+
+            // Optional: sort slots to reduce deadlocks
+            // (e.g., fill teams with strict regions first)
+
+            return solveSlots(slots);
+        };
+
 };
 
 
@@ -110,17 +240,13 @@ int main() {
     ifstream f("teams.json");
     json teams = json::parse(f);
 
-    Calendar myCal(teams);
+    Calendar cal(teams, 23);
 
-    // manual match making for testing purposes
-    myCal.teams[0].pots[myCal.teams[1].startingPot][0] = 1;
-    myCal.teams[1].pots[myCal.teams[0].startingPot][1] = 0;
-
-    myCal.teams[0].pots[myCal.teams[14].startingPot][0] = 14;
-    myCal.teams[14].pots[myCal.teams[0].startingPot][1] = 0;
-
-    myCal.printCalendar();
-
+    if (!cal.buildCalendar()) {
+        cout << "Draw failed (deadlock)\n";
+    } else {
+        cal.printCalendar();
+    }
 
     return 0;
 }
