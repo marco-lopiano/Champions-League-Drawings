@@ -31,6 +31,14 @@ struct Slot {
     int ha;
 };
 
+// TODO: Possible optimizations:
+// Candidate ordering (least-constraining value) -> Reduces recursion depth
+// Forward checking (early deadlock detection)	-> Prevents deep wasted recursion
+// Caching candidate count -> Avoids recomputing validity each call
+// Weighted heuristics (regions, pots) -> Further improves MRV ordering
+// Retry / alternate -> seeds	Safety net for unlucky seeds
+// Parallel attempts -> For massive speedup if needed
+
 class Calendar {
     private:
         mt19937 rng;
@@ -241,11 +249,18 @@ class Calendar {
             return false;
         };
 
+        int slotDifficulty(const Slot& s) {
+            return getCandidates(s.team, s.pot, s.ha).size();
+        }
+
+
         bool buildCalendar() {
             auto slots = buildSlots();
 
-            // Optional: sort slots to reduce deadlocks
-            // (e.g., fill teams with strict regions first)
+            sort(slots.begin(), slots.end(),
+                [this](const Slot& a, const Slot& b) {
+                    return slotDifficulty(a) < slotDifficulty(b);
+                });
 
             return solveSlots(slots);
         };
@@ -258,7 +273,7 @@ int main() {
     ifstream f("teams.json");
     json teams = json::parse(f);
 
-    Calendar cal(teams, 123456);
+    Calendar cal(teams, 12345);
 
     if (!cal.buildCalendar()) {
         cout << "Draw failed (deadlock)\n";
