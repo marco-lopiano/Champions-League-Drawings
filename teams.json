@@ -1,6 +1,190 @@
 {
-    "Pot1" : [["Real Madrid", 10.0], ["Manchester City", 9.5], ["Bayern Munich", 9.5], ["Paris Saint-Germain", 9.5], ["Liverpool", 9.0], ["Internazionale", 9.0], ["Borussia Dortmund", 9.0], ["RB Leipzig", 7.0], ["Barcelona", 9.5]],
-    "Pot2" : [["Bayer Leverkusen", 8.0], ["Atletico Madrid", 8.0], ["Atalanta", 7.0], ["Juventus", 7.5], ["Benfica", 8.0], ["Arsenal", 8.0], ["Club Brugge", 7], ["Shakhtar Donetsk", 7], ["AC Milan", 7]],
-    "Pot3" : [["Feyenoord", 6.0], ["Sporting CP", 6.0], ["PSV Eindhoven", 7.0], ["Dinamo Zagreb", 6.5], ["FC Salzburg", 6.0], ["Lille", 6.0], ["Red Star Belgrade", 5.5], ["Young Boys", 5.0], ["Celtic", 6.0]],
-    "Pot4" : [["Slovan Bratislava", 4.0], ["AS Monaco", 4.0], ["Sparta Prague", 4.0], ["Aston Villa", 5], ["Bologna", 5.0], ["Girona", 4.0], ["VfB Stuttgart", 4.0], ["Sturm Graz", 4.0], ["Brest", 4.0]]
+    "Pot1": [
+        [
+            "Real Madrid",
+            10.0,
+            "ESP"
+        ],
+        [
+            "Manchester City",
+            9.5,
+            "ENG"
+        ],
+        [
+            "Bayern Munich",
+            9.5,
+            "GER"
+        ],
+        [
+            "Paris Saint-Germain",
+            9.5,
+            "FRA"
+        ],
+        [
+            "Liverpool",
+            9.0,
+            "ENG"
+        ],
+        [
+            "Internazionale",
+            9.0,
+            "ITA"
+        ],
+        [
+            "Borussia Dortmund",
+            9.0,
+            "GER"
+        ],
+        [
+            "RB Leipzig",
+            7.0,
+            "GER"
+        ],
+        [
+            "Barcelona",
+            9.5,
+            "ESP"
+        ]
+    ],
+    "Pot2": [
+        [
+            "Bayer Leverkusen",
+            8.0,
+            "GER"
+        ],
+        [
+            "Atletico Madrid",
+            8.0,
+            "ESP"
+        ],
+        [
+            "Atalanta",
+            7.0,
+            "ITA"
+        ],
+        [
+            "Juventus",
+            7.5,
+            "ITA"
+        ],
+        [
+            "Benfica",
+            8.0,
+            "POR"
+        ],
+        [
+            "Arsenal",
+            8.0,
+            "ENG"
+        ],
+        [
+            "Club Brugge",
+            7,
+            "BEL"
+        ],
+        [
+            "Shakhtar Donetsk",
+            7,
+            "UKR"
+        ],
+        [
+            "AC Milan",
+            7,
+            "ITA"
+        ]
+    ],
+    "Pot3": [
+        [
+            "Feyenoord",
+            6.0,
+            "NDL"
+        ],
+        [
+            "Sporting CP",
+            6.0,
+            "POR"
+        ],
+        [
+            "PSV Eindhoven",
+            7.0,
+            "NDL"
+        ],
+        [
+            "Dinamo Zagreb",
+            6.5,
+            "HRV"
+        ],
+        [
+            "FC Salzburg",
+            6.0,
+            "AUT"
+        ],
+        [
+            "Lille",
+            6.0,
+            "FRA"
+        ],
+        [
+            "Red Star Belgrade",
+            5.5,
+            "SRB"
+        ],
+        [
+            "Young Boys",
+            5.0,
+            "CHE"
+        ],
+        [
+            "Celtic",
+            6.0,
+            "SCO"
+        ]
+    ],
+    "Pot4": [
+        [
+            "Slovan Bratislava",
+            4.0,
+            "SVK"
+        ],
+        [
+            "AS Monaco",
+            4.0,
+            "FRA"
+        ],
+        [
+            "Sparta Prague",
+            4.0,
+            "CZE"
+        ],
+        [
+            "Aston Villa",
+            5,
+            "ENG"
+        ],
+        [
+            "Bologna",
+            5.0,
+            "ITA"
+        ],
+        [
+            "Girona",
+            4.0,
+            "ESP"
+        ],
+        [
+            "VfB Stuttgart",
+            4.0,
+            "GER"
+        ],
+        [
+            "Sturm Graz",
+            4.0,
+            "AUT"
+        ],
+        [
+            "Brest",
+            4.0,
+            "FRA"
+        ]
+    ]
 }
