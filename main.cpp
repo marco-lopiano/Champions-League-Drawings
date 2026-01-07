@@ -92,6 +92,11 @@ class Calendar {
         // TODO: add color to team based on pot
         // TODO: add color to pot matches based on difficulty
         void printCalendar() {
+
+            double globalTemperatureScore = 0.0;
+            const double homePlus = 1.15;
+            const double awayMinus = 0.75;
+
             constexpr int teamNameWidth = 22;
 
             cout << "┌" << string(teamNameWidth + 4 * 7, '-') << "┐" << "\n";
@@ -115,13 +120,30 @@ class Calendar {
             for (const Team& t : teams) {
                 cout << "|" << setw(teamNameWidth) << left << t.name << "|";
                 
+                double teamTemp = 0.0;
+
                 constexpr int potWidth = 3;
                 for (int p = 0; p < 4; ++p) {
+
+                    double oppenentHome_mult = teams[ t.pots[p][1] ].rating * homePlus;
+                    double opponentAway_mult = teams[ t.pots[p][0] ].rating * awayMinus;
+
+                    teamTemp += (t.rating * homePlus) + opponentAway_mult + (t.rating * awayMinus) + oppenentHome_mult;
+
                     cout << setw(potWidth) << t.pots[p][0] << setw(potWidth) << right << t.pots[p][1] << "|";
+
+                    globalTemperatureScore += teamTemp;
+
+                    if (p == 3) {
+                        cout << " -----> Team Temperature: " << teamTemp;
+                    }
+
                 }
                 cout << "\n";
             }
             cout << "└" << string(teamNameWidth + 4 * 7, '-') << "┘" << "\n";
+
+            cout << "Global Temperature Score: " << globalTemperatureScore << endl;
         };
 
         vector<Slot> buildSlots() {
