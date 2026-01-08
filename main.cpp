@@ -94,9 +94,6 @@ class Calendar {
         void printCalendar() {
 
             double globalTemperatureScore = 0.0;
-            const double homePlus = 1.15;
-            const double awayMinus = 0.75;
-
             constexpr int teamNameWidth = 22;
 
             cout << "┌" << string(teamNameWidth + 4 * 7, '-') << "┐" << "\n";
