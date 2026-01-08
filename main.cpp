@@ -125,18 +125,20 @@ class Calendar {
                 constexpr int potWidth = 3;
                 for (int p = 0; p < 4; ++p) {
 
-                    double oppenentHome_mult = teams[ t.pots[p][1] ].rating * homePlus;
-                    double opponentAway_mult = teams[ t.pots[p][0] ].rating * awayMinus;
+                    for (int ha=0; ha<2; ha++) {
 
-                    teamTemp += (t.rating * homePlus) + opponentAway_mult + (t.rating * awayMinus) + oppenentHome_mult;
+                        double venueFactor = (ha == 0 ? 0.9 : 1.1);
+                        double relative = sqrt(teams[t.pots[p][ha]].rating / t.rating);
+                        teamTemp += teams[t.pots[p][ha]].rating * relative * venueFactor;
 
+                    }
+                    
                     cout << setw(potWidth) << t.pots[p][0] << setw(potWidth) << right << t.pots[p][1] << "|";
-
-                    globalTemperatureScore += teamTemp;
 
                     if (p == 3) {
                         cout << " -----> Team Temperature: " << teamTemp;
-                    }
+                        globalTemperatureScore += teamTemp;
+                    };
 
                 }
                 cout << "\n";
@@ -295,7 +297,7 @@ int main() {
     ifstream f("teams.json");
     json teams = json::parse(f);
 
-    Calendar cal(teams, 12345);
+    Calendar cal(teams, 123456);
 
     if (!cal.buildCalendar()) {
         cout << "Draw failed (deadlock)\n";
