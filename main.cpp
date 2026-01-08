@@ -92,6 +92,11 @@ class Calendar {
         // TODO: add color to team based on pot
         // TODO: add color to pot matches based on difficulty
         void printCalendar() {
+
+            double globalTemperatureScore = 0.0;
+            const double homePlus = 1.15;
+            const double awayMinus = 0.75;
+
             constexpr int teamNameWidth = 22;
 
             cout << "┌" << string(teamNameWidth + 4 * 7, '-') << "┐" << "\n";
@@ -115,13 +120,32 @@ class Calendar {
             for (const Team& t : teams) {
                 cout << "|" << setw(teamNameWidth) << left << t.name << "|";
                 
+                double teamTemp = 0.0;
+
                 constexpr int potWidth = 3;
                 for (int p = 0; p < 4; ++p) {
+
+                    for (int ha=0; ha<2; ha++) {
+
+                        double venueFactor = (ha == 0 ? 0.9 : 1.1);
+                        double relative = sqrt(teams[t.pots[p][ha]].rating / t.rating);
+                        teamTemp += teams[t.pots[p][ha]].rating * relative * venueFactor;
+
+                    }
+                    
                     cout << setw(potWidth) << t.pots[p][0] << setw(potWidth) << right << t.pots[p][1] << "|";
+
+                    if (p == 3) {
+                        cout << " -----> Team Temperature: " << teamTemp;
+                        globalTemperatureScore += teamTemp;
+                    };
+
                 }
                 cout << "\n";
             }
             cout << "└" << string(teamNameWidth + 4 * 7, '-') << "┘" << "\n";
+
+            cout << "Global Temperature Score: " << globalTemperatureScore << endl;
         };
 
         vector<Slot> buildSlots() {
@@ -273,7 +297,7 @@ int main() {
     ifstream f("teams.json");
     json teams = json::parse(f);
 
-    Calendar cal(teams, 12345);
+    Calendar cal(teams, 123456);
 
     if (!cal.buildCalendar()) {
         cout << "Draw failed (deadlock)\n";
