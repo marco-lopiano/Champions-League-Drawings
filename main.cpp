@@ -7,6 +7,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <optional>
+#include <cstdlib>
 
 using namespace std;
 using json = nlohmann::json;
@@ -289,12 +290,29 @@ class Calendar {
 };
 
 
-int main() {
+int main(int argc, char* argv[]) {
 
     ifstream f("teams.json");
     json teams = json::parse(f);
 
-    Calendar cal(teams, 123456);
+    int seed = 123456;
+    string output = "Generating calendar with default seed: ";
+
+    if (argc>=2) {
+        int _seed = atoi(argv[1]);
+
+        if (_seed!=0) {
+            seed = _seed;
+            output = "Generating calendar with seed: ";
+        }
+
+    }
+
+    cout << endl;
+    cout << output << seed << endl;
+    cout << endl;
+
+    Calendar cal(teams, seed);
 
     if (!cal.buildCalendar()) {
         cout << "Draw failed (deadlock)\n";
